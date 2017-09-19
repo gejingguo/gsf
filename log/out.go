@@ -58,12 +58,12 @@ func NewDateFileWriter(filename string, df int, size int) (*DateFileWriter, erro
 }
 
 type DateFileLoggerParam struct{
-	Flag 	int			// 标记
-	Level	int			// 日志等级
-	Sep 	string		// 字段分隔符
-	File 	string		// 日志文件名含路径
-	Df 		int 		// 日期格式，每日，还是每小时
-	Size 	int 		// 日志单个文件大小上限
+	Flag 	int		`json:"flag"`			// 标记
+	Level	int		`json:"level"`			// 日志等级
+	Sep 	string	`json:"sep"`			// 字段分隔符
+	File 	string	`json:"file"`			// 日志文件名含路径
+	Df 		int		`json:"df"`		 		// 日期格式，每日，还是每小时
+	Size 	int		`json:"size"`	 		// 日志单个文件大小上限
 }
 func NewDateFileLogger(p DateFileLoggerParam) (*Logger, error) {
 	out, err := NewDateFileWriter(p.File, p.Df, p.Size)

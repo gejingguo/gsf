@@ -1,0 +1,32 @@
+syntax = "proto3";
+package msg;
+
+enum Cmd {
+    Cmd_ID_None            = 0;
+    RegSvr_RegReq          = 1001;
+    RegSvr_RegNtf          = 1002;
+}
+
+enum ServerType {
+    ServerType_None         = 0;
+    ServerType_Reg          = 1;    // 注册服务器
+    ServerType_World        = 2;    // 单服世界服务器
+    ServerType_Scene        = 3;    // 场景服务器
+    ServerType_Gate         = 4;    // 网关服务器
+}
+
+message ServerInfo {
+    int32 id                = 1;    //
+    int32 type              = 2;    // 类型,ServerType
+    int32 group             = 3;    // 服务器组，不同服可以划到一组内，之间服务器相连
+    int32 listenAddr        = 4;    // 监听地址，服务器之间连接
+}
+
+message CmdRegSvrRegReq {
+    ServerInfo server       = 1;
+    repeated int32 serverType = 2;  // 关心的非同组的，其他类型服务器
+}
+
+message CmdRegSvrRegNtf {
+    repeated ServerInfo server = 2; // 自己需要连接的服务器信息
+}
