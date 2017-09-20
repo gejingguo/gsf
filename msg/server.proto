@@ -19,7 +19,7 @@ message ServerInfo {
     int32 id                = 1;    //
     int32 type              = 2;    // 类型,ServerType
     int32 group             = 3;    // 服务器组，不同服可以划到一组内，之间服务器相连
-    int32 listenAddr        = 4;    // 监听地址，服务器之间连接
+    string listenAddr       = 4;    // 监听地址，服务器之间连接
 }
 
 message CmdRegSvrRegReq {

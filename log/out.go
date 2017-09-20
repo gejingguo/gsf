@@ -57,22 +57,6 @@ func NewDateFileWriter(filename string, df int, size int) (*DateFileWriter, erro
 	return &DateFileWriter{fileName: filename, dateFormat: df, fileSize: size, file: file, lastTime: time.Now()}, nil
 }
 
-type DateFileLoggerParam struct{
-	Flag 	int		`json:"flag"`			// 标记
-	Level	int		`json:"level"`			// 日志等级
-	Sep 	string	`json:"sep"`			// 字段分隔符
-	File 	string	`json:"file"`			// 日志文件名含路径
-	Df 		int		`json:"df"`		 		// 日期格式，每日，还是每小时
-	Size 	int		`json:"size"`	 		// 日志单个文件大小上限
-}
-func NewDateFileLogger(p DateFileLoggerParam) (*Logger, error) {
-	out, err := NewDateFileWriter(p.File, p.Df, p.Size)
-	if err != nil {
-		return nil, err
-	}
-	return New(out, "", p.Flag, p.Level, p.Sep), nil
-}
-
 func (w *DateFileWriter) Write(p []byte) (n int, err error) {
 	n, err = w.file.Write(p)
 	w.writeSize += n

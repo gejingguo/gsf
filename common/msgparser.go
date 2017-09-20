@@ -9,12 +9,12 @@ import (
 )
 
 type TCPMsg struct {
-	msgId int			// 消息编号
-	msg proto.Message	// protobuf msg
+	MsgId int			// 消息编号
+	Msg proto.Message	// protobuf msg
 }
 
 func CreateTCPMsgByMsgId(msgId int) proto.Message {
-	switch msgId {
+	switch msg.Cmd(msgId) {
 	case msg.Cmd_RegSvr_RegReq:
 		return &msg.CmdRegSvrRegReq{}
 	case msg.Cmd_RegSvr_RegNtf:
@@ -44,10 +44,13 @@ func (mp *MsgBinaryParser) MakePacket() (interface{}, error) {
 			return nil, err
 		}
 	}
-	return &TCPMsg{msgId: msgId, msg: msg}, nil
+	return &TCPMsg{MsgId: msgId, Msg: msg}, nil
 }
 
 func (mp *MsgBinaryParser) Read(reader io.Reader) (interface{}, error) {
+	if mp.header == nil {
+		mp.header = make([]byte, 4)
+	}
 	// 读取头部
 	n, err := reader.Read(mp.header)
 	if n != len(mp.header) {
@@ -72,8 +75,8 @@ func (mp *MsgBinaryParser) Read(reader io.Reader) (interface{}, error) {
 func (mp *MsgBinaryParser) Write(msg interface{}, writer io.Writer) error {
 	if tmsg, ok := msg.(*TCPMsg); ok {
 		var head [4]byte
-		binary.BigEndian.PutUint16(head[2:4], uint16(tmsg.msgId))
-		data, err := proto.Marshal(tmsg.msg)
+		binary.BigEndian.PutUint16(head[2:4], uint16(tmsg.MsgId))
+		data, err := proto.Marshal(tmsg.Msg)
 		if err != nil {
 			return err
 		}

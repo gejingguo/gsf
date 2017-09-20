@@ -6,7 +6,6 @@ import (
 	"time"
 	"runtime"
 	"fmt"
-	"os"
 )
 
 // 日志等级
@@ -31,22 +30,16 @@ const (
 
 // 日志类型
 type Logger struct {
-	mu     sync.Mutex // ensures atomic writes; protects the following fields
-	prefix string     // prefix to write at beginning of each line
-	flag   int        // properties
-	out    io.Writer  // destination for output
-	buf    []byte     // for accumulating text to write
+	mu     sync.Mutex 	// ensures atomic writes; protects the following fields
+	prefix string     	// prefix to write at beginning of each line
+	flag   int        	// properties
+	out    []io.Writer  // destination for output
+	buf    []byte     	// for accumulating text to write
 	level	int		  	// 等级
 	sep		string		// 字段分隔符
 }
 
-func New(out io.Writer, prefix string, flag int, level int, sep string) *Logger {
-	return &Logger{prefix:prefix, flag:flag, out:out, level:level, sep:sep}
-}
-
-var Std = New(os.Stdout, "", LstdFlags, LogLevelInfo, "|")
-
-func (l *Logger) SetOutput(w io.Writer) {
+func (l *Logger) SetOutput(w []io.Writer) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.out = w
@@ -206,8 +199,16 @@ func (l *Logger) Output(level int, calldepth int, s string) error {
 	if len(s) == 0 || s[len(s)-1] != '\n' {
 		l.buf = append(l.buf, '\n')
 	}
-	_, err := l.out.Write(l.buf)
-	return err
+	for _, out := range l.out {
+		if out == nil {
+			continue
+		}
+		_, err := out.Write(l.buf)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Printf calls l.Output to print to the logger.

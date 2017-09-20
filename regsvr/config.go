@@ -10,7 +10,7 @@ import (
 type Config struct {
 	Daemon 		int 						`json:"daemon"`					// 是否后台启动
 	ServerAddr 	string 						`json:"server_addr"`			// 服务器地址
-	LogConf 	log.DateFileLoggerParam		`json:"log_conf"`				// 日志参数配置
+	LogConf 	log.LoggerConfig			`json:"log_conf"`				// 日志参数配置
 }
 
 var config = &Config{}
@@ -25,7 +25,7 @@ func (c *Config) Init(filename string) error {
 	if err != nil {
 		return err
 	}
-	logger, err = log.NewDateFileLogger(config.LogConf)
+	logger, err = log.NewByConfig(&config.LogConf)
 	if err != nil {
 		return err
 	}

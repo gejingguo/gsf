@@ -1,47 +1,42 @@
 package main
 
 import (
-	"github.com/golang/protobuf/proto"
+	"net"
 	"fmt"
-	"gsf/log"
+	"gsf/msg"
+	"gsf/common"
+	"time"
 )
 
 func main() {
-	/*
-	tcp.NewConnectTCPSession("180.97.33.108:80", func(session *tcp.TCPSession, err error) {
-		if err == nil {
-			fmt.Println("connect ok.")
-		} else {
-			fmt.Println("connect failed.")
-			session.Close(err)
-		}
-	})
-
-	tcp.Run()
-	*/
-	proto.Marshal()
-
-	/*logw, err := log.NewDateFileWriter("D:\\client.log", log.DateFileFormatDayly, 10000)
+	conn, err := net.Dial("tcp", "localhost:9002")
 	if err != nil {
-		fmt.Println("open faile failed, err:", err)
+		fmt.Println("connect server failed, err:", err)
 		return
 	}
-	logger := log.New(logw, "", log.LstdFlags, log.LogLevelDebug, "|")*/
-	logger, err := log.NewDateFileLogger(log.DateFileLoggerParam{
-		Flag: log.LstdFlags,
-		Level: log.LogLevelDebug,
-		Sep: "|",
-		File: "D:\\client.log",
-		Df: log.DateFileFormatDayly,
-		Size: 10240,
-	})
+
+	req := &msg.CmdRegSvrRegReq {
+		Server: &msg.ServerInfo{
+			Id: 1,
+			Type: 1,
+			Group: 1,
+			ListenAddr: "localhost:9002",
+		},
+	}
+
+	msgParser := common.MsgBinaryParser{}
+	tmsg := &common.TCPMsg{
+		MsgId: int(msg.Cmd_RegSvr_RegReq),
+		Msg: req,
+	}
+	err = msgParser.Write(tmsg, conn)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("write msg failed, err:", err)
 		return
 	}
-	logger.Debugf("pb: %v", tab)
-	logger.Infof("pb: %v", tab)
-	logger.Warnf("pb: %v", tab)
-	logger.Errorf("pb: %v", tab)
-	logger.Fatalf("pb: %v", tab)
+	fmt.Println("write msg ok.")
+
+	for {
+		time.Sleep(1)
+	}
 }
